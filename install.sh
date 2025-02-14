@@ -35,13 +35,6 @@ docker compose exec laravel php artisan horizon:install
 echo "Running Migrations..."
 docker compose exec laravel php artisan migrate --force
 
-echo "Clearing Cache..."
-docker compose exec laravel php artisan cache:clear
-docker compose exec laravel php artisan config:clear
-docker compose exec laravel php artisan queue:restart
-
-echo "Ensuring Horizon stays running..."
-docker compose exec laravel php artisan horizon:terminate
-docker compose exec -d laravel php artisan horizon
+docker compose up -d
 
 echo "Project installation is complete! You can now use the application."
