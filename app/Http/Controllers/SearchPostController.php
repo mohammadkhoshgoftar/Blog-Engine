@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\SearchPostResource;
 use App\Services\SearchService;
 use Illuminate\Http\Request;
 use App\Models\Post;
@@ -17,10 +18,9 @@ class SearchPostController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        $this->searchService->searchPosts($request);
-
-
+        $response = $this->searchService->searchPosts($request->search);
+        return SearchPostResource::collection(collect($response['hits']['hits']));
     }
 }
