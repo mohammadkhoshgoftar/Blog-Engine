@@ -1,4 +1,3 @@
-
 echo "Starting Blog Engine project installation..."
 
 if [ ! -f ".env" ]; then
@@ -16,20 +15,33 @@ until [ "$(docker inspect -f '{{.State.Running}}' $(docker compose ps -q laravel
   sleep 1
 done
 
+echo "Waiting for MySQL to be ready..."
+until docker compose exec mysql mysqladmin ping -h "localhost" --silent; do
+    sleep 2
+done
+
 echo "Running Composer Install..."
 docker compose exec laravel composer install --no-interaction --optimize-autoloader
+
+echo "Checking if vendor exists..."
+docker compose exec laravel sh -c "[ -d /var/www/html/vendor ] || composer install --no-interaction --optimize-autoloader"
 
 echo "Generating APP_KEY..."
 docker compose exec laravel php artisan key:generate
 
-echo "install horizon..."
+echo "Installing Horizon..."
 docker compose exec laravel php artisan horizon:install
 
 echo "Running Migrations..."
 docker compose exec laravel php artisan migrate --force
 
-echo "Starting Horizon..."
+echo "Clearing Cache..."
+docker compose exec laravel php artisan cache:clear
+docker compose exec laravel php artisan config:clear
 docker compose exec laravel php artisan queue:restart
+
+echo "Ensuring Horizon stays running..."
+docker compose exec laravel php artisan horizon:terminate
 docker compose exec -d laravel php artisan horizon
 
 echo "Project installation is complete! You can now use the application."
