@@ -11,6 +11,9 @@ fi
 echo "Starting Docker..."
 docker compose up -d --build
 
+echo "Waiting for containers to be ready..."
+sleep 10
+
 echo "Running Composer Install..."
 docker compose exec BlogEngine composer install --no-interaction --optimize-autoloader
 
