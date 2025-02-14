@@ -29,6 +29,7 @@ echo "Running Migrations..."
 docker compose exec laravel php artisan migrate --force
 
 echo "Starting Horizon..."
-docker compose exec laravel php artisan horizon
+docker compose exec laravel php artisan queue:restart
+docker compose exec -d laravel php artisan horizon
 
 echo "Project installation is complete! You can now use the application."
